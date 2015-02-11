@@ -19,8 +19,8 @@ var extractMinutesAndSeconds = function(duration) {
 };
 
 /*
-callback: is called once for every video resource
-returns: meta data object with detailed video information of a single video
+callback: is called once for every video resource.
+returns: meta data object with detailed video information of a single video.
 */
 var findVideos = function(keyword, maxResults, callback) {
     Youtube.search.list({
@@ -51,7 +51,7 @@ var findVideos = function(keyword, maxResults, callback) {
                     minutes: duration.minutes,
                     seconds: duration.seconds
                 };
-                
+
                 callback(null, metaData);
             });
         }
@@ -87,6 +87,21 @@ var downloadSongs = function(URLs) {
     };
 };
 
+/*
+Create zip archive containing all the audio files within the audio folder.
+*/
+var zipFiles = function(callback) {
+    console.log('zipping files...');
+    var command = 'zip -r files.zip audio';
+    exec(command, function(error, stdout, stderr) {
+        if (error) {
+            return callback(new Error('Failed to zip files. Reason: ' + error.message));
+        }
+        callback(null);
+        console.log('finished zipping files');
+    });
+};
+
 /////////////////////////////////////////////////////////////////////////////////
 
 Youtube.authenticate({
@@ -94,21 +109,27 @@ Youtube.authenticate({
     key: "AIzaSyCUS64-tEZ663s3vLyEdyet1lMJU2rn1-c"
 });
 
+
 var main = function() {
-    var urls = [];
-    findVideos('Die Höhner', MAX_RESULTS, function(err, metaData) {
-        if (err) {
-            console.log(err);
-        }
-     
-        urls[urls.length] = metaData.URL;
-        console.log(metaData);
-        // start audio extraction
-        if (urls.length == MAX_RESULTS) {
-             return downloadSongs(urls);
+
+    zipFiles(function(error){
+        if (error) {
+            console.log(error);
         }
     });
+
+    // var urls = [];
+    // findVideos('Die Höhner', MAX_RESULTS, function(err, metaData) {
+    //     if (err) {
+    //         console.log(err);
+    //     }
+
+    //     urls[urls.length] = metaData.URL;
+    //     console.log(metaData);
+    //     // start audio extraction
+    //     if (urls.length == MAX_RESULTS) {
+    //          return downloadSongs(urls);
+    //     }
+    // });
 };
 main();
-
-
