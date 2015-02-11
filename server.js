@@ -3,7 +3,7 @@ var exec = require('child_process').exec;
 var Youtube = require("youtube-api");
 var filePrefix = 'file';
 
-var MAX_RESULTS = 10;
+var MAX_RESULTS = 5;
 
 /*
 duration: ISO 8601 String
@@ -96,7 +96,7 @@ Youtube.authenticate({
 
 var main = function() {
     var urls = [];
-    findVideos('rynerrr', MAX_RESULTS, function(err, metaData) {
+    findVideos('Die Höhner', MAX_RESULTS, function(err, metaData) {
         if (err) {
             console.log(err);
         }
