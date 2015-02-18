@@ -60,17 +60,23 @@ var findVideos = function(keyword, maxResults, callback) {
 
 /*
 Download a single Song.
+Uses 'spawn' instead of 'exec' so that the download progress can be fetched.
+In order to filter the stdout output, every process has a unique id.
 */
 var download = function(URL, index, callback) {
     var fileName = filePrefix + index;
-    var command = 'youtube-dl -o "' + fileName + '.%(ext)s" --extract-audio --audio-format mp3 ' + URL;
-    console.log('downloading ' + fileName);
-    exec(command, function(error, stdout, stderr) {
-        if (error) {
-            return callback(new Error('Failed to load URL at index ' + index + '. Reason: ' + error.message));
-        }
-        callback(null);
-        console.log('finished downloading file ' + index);
+    var spawn = require('child_process').spawn;
+    var process = spawn('youtube-dl', ['-o', fileName+'.%(ext)s', '--newline', '--extract-audio', '--audio-format', 'mp3', URL]);
+    process.id = index;
+
+    process.stdout.on('data', function(data) {
+        console.log(process.id+'stdout: ' + data);
+    });
+    process.stderr.on('data', function(data) {
+        console.log(process.id+'stderr: ' + data);
+    });
+    process.on('close', function(code) {
+        console.log(process.id+'child process exited with code ' + code);
     });
 };
 
@@ -112,24 +118,18 @@ Youtube.authenticate({
 
 var main = function() {
 
-    zipFiles(function(error){
-        if (error) {
-            console.log(error);
+    var urls = [];
+    findVideos('Die Höhner', MAX_RESULTS, function(err, metaData) {
+        if (err) {
+            console.log(err);
+        }
+
+        urls[urls.length] = metaData.URL;
+        console.log(metaData);
+        // start audio extraction
+        if (urls.length == MAX_RESULTS) {
+             return downloadSongs(urls);
         }
     });
-
-    // var urls = [];
-    // findVideos('Die Höhner', MAX_RESULTS, function(err, metaData) {
-    //     if (err) {
-    //         console.log(err);
-    //     }
-
-    //     urls[urls.length] = metaData.URL;
-    //     console.log(metaData);
-    //     // start audio extraction
-    //     if (urls.length == MAX_RESULTS) {
-    //          return downloadSongs(urls);
-    //     }
-    // });
 };
 main();
