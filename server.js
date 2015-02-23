@@ -1,9 +1,14 @@
-var fs = require('fs');
-var exec = require('child_process').exec;
-var Youtube = require("youtube-api");
-var filePrefix = 'file';
+//var exec = require('child_process').exec;
+var spawn = require('child_process').spawn;
+var Youtube = require('youtube-api');
 
-var MAX_RESULTS = 5;
+var filePrefix = 'file';
+var MAX_RESULTS = 2;
+var DEFAULT_ARTIST = "Herbert Grönemeyer";
+var DEFAULT_PATH = "~/Music/youtube-mp3-download";
+
+var path = DEFAULT_PATH;
+var artist = DEFAULT_ARTIST;
 
 /*
 duration: ISO 8601 String
@@ -65,8 +70,7 @@ In order to filter the stdout output, every process has a unique id.
 */
 var download = function(URL, index, callback) {
     var fileName = filePrefix + index;
-    var spawn = require('child_process').spawn;
-    var process = spawn('youtube-dl', ['-o', fileName+'.%(ext)s', '--newline', '--extract-audio', '--audio-format', 'mp3', URL]);
+    var process = spawn('youtube-dl', ['-o', path+'/'+fileName+'.%(ext)s', '--newline', '--extract-audio', '--audio-format', 'mp3', URL]);
     process.id = index;
 
     process.stdout.on('data', function(data) {
@@ -116,10 +120,32 @@ Youtube.authenticate({
 });
 
 
-var main = function() {
+var assignCommandLineParameters = function() {
+if (process.argv.length < 3) {
+        console.log('You must provide an Artist. Usage: server.js ARTIST [PATH]');
+        process.exit(1);
+    } else if (process.argv.length > 4) {
+        console.log('Too many arguments. Usage: server.js ARTIST [PATH]');
+        process.exit(1);
+    }
+    artist = process.argv[2];
+    if (process.argv[3]) {
+        path = process.argv[3];
+    } else {
+        console.log('No path specified. Using default: '+DEFAULT_PATH);
+    }
+    console.log('--- SEARCH INFORMATION --- ');
+    console.log('Artist: '+artist);
+    console.log('Output Path: '+path);
+    console.log('--------------------------');
+};
 
+var main = function() {
+    assignCommandLineParameters();
+
+    // Download Songs
     var urls = [];
-    findVideos('Die Höhner', MAX_RESULTS, function(err, metaData) {
+    findVideos(artist, MAX_RESULTS, function(err, metaData) {
         if (err) {
             console.log(err);
         }
@@ -128,8 +154,8 @@ var main = function() {
         console.log(metaData);
         // start audio extraction
         if (urls.length == MAX_RESULTS) {
-             return downloadSongs(urls);
-        }
-    });
+           return downloadSongs(urls);
+       }
+   });
 };
 main();
