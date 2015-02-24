@@ -1,14 +1,26 @@
-//var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var Youtube = require('youtube-api');
 
+exports.progress = [];
+var songs = []; // metadata about every song
 var filePrefix = 'file';
-var MAX_RESULTS = 2;
-var DEFAULT_ARTIST = "Herbert Grönemeyer";
-var DEFAULT_PATH = "~/Music/youtube-mp3-download";
+var MAX_RESULTS = 4;
+exports.MAX_RESULTS = MAX_RESULTS;
 
-var path = DEFAULT_PATH;
-var artist = DEFAULT_ARTIST;
+/*
+Save metaData about every song.
+*/
+exports.search = function(artist, clientCallback) {
+    findVideos(artist, MAX_RESULTS, function(err, metaData) {
+        if (err) {
+            console.log(err);
+        }
+        songs[songs.length] = metaData;
+        if (songs.length == MAX_RESULTS) {
+           clientCallback(songs);
+       }
+   });
+}
 
 /*
 duration: ISO 8601 String
@@ -68,18 +80,20 @@ Download a single Song.
 Uses 'spawn' instead of 'exec' so that the download progress can be fetched.
 In order to filter the stdout output, every process has a unique id.
 */
-var download = function(URL, index, callback) {
+var download = function(URL, path, index, callback) {
     var fileName = filePrefix + index;
     var process = spawn('youtube-dl', ['-o', path+'/'+fileName+'.%(ext)s', '--newline', '--extract-audio', '--audio-format', 'mp3', URL]);
     process.id = index;
 
     process.stdout.on('data', function(data) {
-        console.log(process.id+'stdout: ' + data);
+        exports.progress[process.id] = data;
+        //console.log(process.id+'stdout: ' + data);
     });
     process.stderr.on('data', function(data) {
         console.log(process.id+'stderr: ' + data);
     });
     process.on('close', function(code) {
+        exports.progress[process.id] = 'Download complete.';
         console.log(process.id+'child process exited with code ' + code);
     });
 };
@@ -87,9 +101,9 @@ var download = function(URL, index, callback) {
 /*
 Download an Array of Songs.
 */
-var downloadSongs = function(URLs) {
+var downloadSongs = function(URLs, path) {
     for (var i = 0; i < URLs.length; i++) {
-        download(URLs[i], i, function(error) {
+        download(URLs[i], path,  i, function(error) {
             if (error) {
                 console.log(error);
             }
@@ -119,43 +133,14 @@ Youtube.authenticate({
     key: "AIzaSyCUS64-tEZ663s3vLyEdyet1lMJU2rn1-c"
 });
 
-
-var assignCommandLineParameters = function() {
-if (process.argv.length < 3) {
-        console.log('You must provide an Artist. Usage: server.js ARTIST [PATH]');
-        process.exit(1);
-    } else if (process.argv.length > 4) {
-        console.log('Too many arguments. Usage: server.js ARTIST [PATH]');
-        process.exit(1);
-    }
-    artist = process.argv[2];
-    if (process.argv[3]) {
-        path = process.argv[3];
-    } else {
-        console.log('No path specified. Using default: '+DEFAULT_PATH);
-    }
-    console.log('--- SEARCH INFORMATION --- ');
-    console.log('Artist: '+artist);
-    console.log('Output Path: '+path);
-    console.log('--------------------------');
-};
-
-var main = function() {
-    assignCommandLineParameters();
-
-    // Download Songs
+/*
+Start the download process manually.
+*/
+exports.start = function(path) {
     var urls = [];
-    findVideos(artist, MAX_RESULTS, function(err, metaData) {
-        if (err) {
-            console.log(err);
-        }
-
-        urls[urls.length] = metaData.URL;
-        console.log(metaData);
-        // start audio extraction
-        if (urls.length == MAX_RESULTS) {
-           return downloadSongs(urls);
-       }
-   });
+    for (var i = 0; i < MAX_RESULTS; i++) {
+        urls[i] = songs[i].URL;
+    }
+    downloadSongs(urls, path);
 };
-main();
+
