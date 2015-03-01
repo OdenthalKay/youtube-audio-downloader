@@ -14,7 +14,8 @@
 	*/
 	var searchCallback = function(songs) {
 		for (var i = 0; i < ytDownloader.MAX_RESULTS; i++) {
-    		$('#progress'+i).text(songs[i].title);
+    		//$('#progress'+i).text(songs[i].title);
+    		$('#table-item-text'+i).text(songs[i].title);
     	}; 
 	};
 
@@ -40,7 +41,8 @@
 	var activatePolling = function() {
 		setInterval(function() { 
     		$.each(ytDownloader.progress, function( index, value ) {
-    			$( "#progress" + index ).text(value);
+    			//$( "#progress" + index ).text(value);
+    			$( "#table-item-text" + index ).text(value);
     		});
     	}, 300);
 	};
@@ -51,8 +53,16 @@
 	var init = function() {
 		// Create progress list
     	for (var i = 0; i < ytDownloader.MAX_RESULTS; i++) {
-    		var item = '<li '+'id="progress'+i+'">list element...</li>'; //You can add
-    		$('#list').append(item);
+    		//var item = '<li '+'id="progress'+i+'">list element...</li>'; //You can add
+    		//$('#list').append(item);
+
+    		var item = '<tr><td><button type="button" class="btn btn-default btn-sm"> \
+  						<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> \
+						</button></td> \
+            			<td id="table-item-text'+i+'"></td> \
+          				<th scope="row"><input type="checkbox"></th> \
+          				</tr>';
+          	$('#table').append(item);
     	};
  	};
 
@@ -75,6 +85,8 @@
 
 <div class="panel panel-default" style="width:800px;">
   <!-- Default panel contents -->
+   	<input style="width:450px;" id ="search-box" type="text" name="search box">
+ 	<button id="search" class="btn btn-primary">search</button>
   <div class="panel-heading">
     <strong>Selected:</strong><br>
     <strong>Duration:</strong><br>
@@ -83,7 +95,7 @@
 </div>
 
       <!-- Table -->
-<table class="table">
+<table id="table" class="table">
         <thead>
           <tr><th></th>
           <th>Title</th>
@@ -91,57 +103,17 @@
          
         </tr></thead>
         <tbody>
-          <tr>
-            <td><button type="button" class="btn btn-default btn-sm">
-  <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-</button></td>
-            
-            <td>Rynerrr survival of the fittest LIVE</td>
-            
-            <th scope="row"><input type="checkbox"></th>
-          </tr>
-          <tr>
-            <td><button type="button" class="btn btn-default btn-sm">
-  <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-</button></td>
-            
-            <td>Rynerrr survival of the fittest LIVE</td>
-            
-            <th scope="row"><input type="checkbox"></th>
-          </tr>
-          <tr>
-            <td><button type="button" class="btn btn-default btn-sm">
-  <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-</button></td>
-            
-            <td>Rynerrr survival of the fittest LIVE</td>
-            
-            <th scope="row"><input type="checkbox"></th>
-          </tr>
-
-
+ 		<!-- items are created dynamically -->
         </tbody>
       </table>
   <div class="panel-footer clearfix">
         <div class="pull-left">
-            <a href="#" class="btn btn-primary">Download</a>
-          	<a href="#" class="btn btn-default">Directory</a> No download path specified.
+            <a href="#" class="btn btn-primary" id="download">Download</a>
+          	<a href="#" class="btn btn-default" id="directory">Directory</a> <strong id="directory-path">No download path specified.</strong>
         </div>
     </div>
 </div>
  
-
-
- 	
- 	<h1>Youtube MP3 Downloader</h1>
- 	<!-- don't show default directory chooser, use custom html -->
- 	<input style="display:none;" id="download-path" type="file" nwdirectory/>
- 	<div><button id='directory'>choose download path</button><bold id="directory-path"> no path specified</bold></div>
- 	
- 	<input id ="search-box" type="text" name="search box">
- 	<button id='search'>search</button>
- 	<button id='download'>download</button>
-	<ul id="list"></ul>
 
 	<script>
 	$( document ).ready(init);

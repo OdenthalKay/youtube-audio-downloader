@@ -13,12 +13,7 @@
   "window": {
     "title": "node-webkit demo",
     "toolbar": true,
-    "width": 700,
-    "height": 800,
-    "position": "mouse",
-    "min_width": 700,
-    "min_height": 800,
-    "max_width": 700,
-    "max_height": 800
+    "width": 900,
+    "height": 800
   }
 }
