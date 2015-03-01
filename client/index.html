@@ -5,9 +5,9 @@
 	<title>title</title>
 	<link rel="stylesheet" href="style.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 	<script>
 	var ytDownloader = require('../server.js');
-	//
 
 	/*
 	Called once the youtube search has finished.
@@ -72,6 +72,67 @@
 
  </head>
  <body>
+
+<div class="panel panel-default" style="width:800px;">
+  <!-- Default panel contents -->
+  <div class="panel-heading">
+    <strong>Selected:</strong><br>
+    <strong>Duration:</strong><br>
+    <strong>Size:</strong>
+      
+</div>
+
+      <!-- Table -->
+<table class="table">
+        <thead>
+          <tr><th></th>
+          <th>Title</th>
+          <th><input type="checkbox"></th>
+         
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><button type="button" class="btn btn-default btn-sm">
+  <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+</button></td>
+            
+            <td>Rynerrr survival of the fittest LIVE</td>
+            
+            <th scope="row"><input type="checkbox"></th>
+          </tr>
+          <tr>
+            <td><button type="button" class="btn btn-default btn-sm">
+  <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+</button></td>
+            
+            <td>Rynerrr survival of the fittest LIVE</td>
+            
+            <th scope="row"><input type="checkbox"></th>
+          </tr>
+          <tr>
+            <td><button type="button" class="btn btn-default btn-sm">
+  <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+</button></td>
+            
+            <td>Rynerrr survival of the fittest LIVE</td>
+            
+            <th scope="row"><input type="checkbox"></th>
+          </tr>
+
+
+        </tbody>
+      </table>
+  <div class="panel-footer clearfix">
+        <div class="pull-left">
+            <a href="#" class="btn btn-primary">Download</a>
+          	<a href="#" class="btn btn-default">Directory</a> No download path specified.
+        </div>
+    </div>
+</div>
+ 
+
+
+ 	
  	<h1>Youtube MP3 Downloader</h1>
  	<!-- don't show default directory chooser, use custom html -->
  	<input style="display:none;" id="download-path" type="file" nwdirectory/>

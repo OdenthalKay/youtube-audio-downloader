@@ -9,5 +9,16 @@
     "async": "~0.2.8",
     "express": "~3.2.4",
     "socket.io": "~0.9.14"
+  },
+  "window": {
+    "title": "node-webkit demo",
+    "toolbar": true,
+    "width": 700,
+    "height": 800,
+    "position": "mouse",
+    "min_width": 700,
+    "min_height": 800,
+    "max_width": 700,
+    "max_height": 800
   }
 }
