@@ -12,10 +12,9 @@
 	/*
 	Called once the youtube search has finished.
 	*/
-	var searchCallback = function(songs) {
+	var searchCallback = function() {
 		for (var i = 0; i < ytDownloader.SONG_SLOTS; i++) {
-    		//$('#progress'+i).text(songs[i].title);
-    		$('#table-item-text'+i).text(songs[i].title);
+    		$('#table-item-text'+i).text(ytDownloader.visibleSongs[i].title);
     	}; 
 	};
 
@@ -25,6 +24,20 @@
 	var search = function() {
 		var artist = $('#search-box').val();
 		ytDownloader.search(artist,searchCallback); 
+	};
+
+	/*
+	Replace current song with next song in the queue.
+	*/
+	var refresh = function() {
+		console.log(ytDownloader.visibleSongs);
+		var nextSong = ytDownloader.songs.shift();
+		var oldSong = ytDownloader.visibleSongs[0];
+		console.log(oldSong);
+		ytDownloader.songs[ytDownloader.songs.length] = oldSong;
+		console.log(ytDownloader.songs);
+		ytDownloader.visibleSongs[0] = nextSong;
+		$('#table-item-text'+0).text(ytDownloader.visibleSongs[0].title);
 	};
 
 	/*
@@ -52,18 +65,20 @@
 	*/
 	var init = function() {
 		// Create progress list
-    	for (var i = 0; i < ytDownloader.MAX_RESULTS; i++) {
+    	for (var i = 0; i < ytDownloader.SONG_SLOTS; i++) {
     		//var item = '<li '+'id="progress'+i+'">list element...</li>'; //You can add
     		//$('#list').append(item);
 
-    		var item = '<tr><td><button type="button" class="btn btn-default btn-sm"> \
-  						<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> \
+    		var item = '<tr><td><button id="refreshButton'+i+'" type="button" class="btn btn-default btn-sm"> \
+  						<span  class="glyphicon glyphicon-refresh" aria-hidden="true"></span> \
 						</button></td> \
             			<td id="table-item-text'+i+'"></td> \
           				<th scope="row"><input type="checkbox"></th> \
           				</tr>';
           	$('#table').append(item);
     	};
+    	document.getElementById('refreshButton0').onclick = refresh;
+    	console.log('init done.');
  	};
 
  	/*

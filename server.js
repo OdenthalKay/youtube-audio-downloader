@@ -2,11 +2,11 @@ var spawn = require('child_process').spawn;
 var Youtube = require('youtube-api');
 
 exports.progress = [];
-var songs = []; // metadata about every song
-var visibleSongs = []; // songs seen by the user
+exports.songs = []; // metadata about every song
+exports.visibleSongs = []; // songs seen by the user
 var filePrefix = 'file';
-var MAX_RESULTS = 8;
-var SONG_SLOTS = 4;
+var MAX_RESULTS = 4;
+var SONG_SLOTS = 2;
 exports.MAX_RESULTS = MAX_RESULTS;
 exports.SONG_SLOTS = SONG_SLOTS;
 
@@ -18,10 +18,11 @@ exports.search = function(artist, clientCallback) {
         if (err) {
             console.log(err);
         }
-        songs[songs.length] = metaData;
-        if (songs.length == MAX_RESULTS) {
-           visibleSongs = songs.splice(SONG_SLOTS, songs.length);
-           clientCallback(visibleSongs);
+        exports.songs[exports.songs.length] = metaData;
+        if (exports.songs.length == MAX_RESULTS) {
+           exports.visibleSongs = exports.songs.slice(0, SONG_SLOTS);
+           exports.songs.splice(0, SONG_SLOTS);
+           clientCallback();
        }
    });
 };
@@ -143,7 +144,7 @@ Start the download process manually.
 exports.start = function(path) {
     var urls = [];
     for (var i = 0; i < MAX_RESULTS; i++) {
-        urls[i] = songs[i].URL;
+        urls[i] = exports.songs[i].URL;
     }
     downloadSongs(urls, path);
 };
