@@ -3,9 +3,12 @@ var Youtube = require('youtube-api');
 
 exports.progress = [];
 var songs = []; // metadata about every song
+var visibleSongs = []; // songs seen by the user
 var filePrefix = 'file';
-var MAX_RESULTS = 4;
+var MAX_RESULTS = 8;
+var SONG_SLOTS = 4;
 exports.MAX_RESULTS = MAX_RESULTS;
+exports.SONG_SLOTS = SONG_SLOTS;
 
 /*
 Save metaData about every song.
@@ -17,10 +20,11 @@ exports.search = function(artist, clientCallback) {
         }
         songs[songs.length] = metaData;
         if (songs.length == MAX_RESULTS) {
-           clientCallback(songs);
+           visibleSongs = songs.splice(SONG_SLOTS, songs.length);
+           clientCallback(visibleSongs);
        }
    });
-}
+};
 
 /*
 duration: ISO 8601 String
@@ -82,7 +86,7 @@ In order to filter the stdout output, every process has a unique id.
 */
 var download = function(URL, path, index, callback) {
     var fileName = filePrefix + index;
-    var process = spawn('youtube-dl', ['-o', path+'/'+fileName+'.%(ext)s', '--newline', '--extract-audio', '--audio-format', 'mp3', URL]);
+    var process = spawn('python', ['./youtube-dl','-o', path+'/'+fileName+'.%(ext)s', '--newline', '--extract-audio', '--audio-format', 'mp3', URL]);
     process.id = index;
 
     process.stdout.on('data', function(data) {

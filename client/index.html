@@ -13,7 +13,7 @@
 	Called once the youtube search has finished.
 	*/
 	var searchCallback = function(songs) {
-		for (var i = 0; i < ytDownloader.MAX_RESULTS; i++) {
+		for (var i = 0; i < ytDownloader.SONG_SLOTS; i++) {
     		//$('#progress'+i).text(songs[i].title);
     		$('#table-item-text'+i).text(songs[i].title);
     	}; 
