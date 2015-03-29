@@ -5,8 +5,8 @@ exports.progress = [];
 exports.songs = []; // metadata about every song
 exports.visibleSongs = []; // songs seen by the user
 var filePrefix = 'file';
-var MAX_RESULTS = 4;
-var SONG_SLOTS = 2;
+var MAX_RESULTS = 20;
+var SONG_SLOTS = 5;
 exports.MAX_RESULTS = MAX_RESULTS;
 exports.SONG_SLOTS = SONG_SLOTS;
 

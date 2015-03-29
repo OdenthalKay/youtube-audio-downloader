@@ -15,8 +15,21 @@
 	var searchCallback = function() {
 		for (var i = 0; i < ytDownloader.SONG_SLOTS; i++) {
     		$('#table-item-text'+i).text(ytDownloader.visibleSongs[i].title);
+    		$('#table-item-duration'+i).text(generateDurationString(i));
     		$('#thumbnail'+i).attr("src",ytDownloader.visibleSongs[i].thumbnail);
     	}; 
+	};
+	
+	var generateDurationString = function(index) {
+		var minutes = ytDownloader.visibleSongs[index].minutes;
+			var seconds = ytDownloader.visibleSongs[index].seconds;
+			var durationString = '';
+			if (seconds < 10) {
+				durationString = minutes+':0'+seconds;
+			} else {
+				durationString = minutes+':'+seconds;
+			}
+			return durationString;
 	};
 
 	/*
@@ -36,6 +49,7 @@
 		ytDownloader.songs[ytDownloader.songs.length] = oldSong;
 		ytDownloader.visibleSongs[this.id] = nextSong;
 		$('#table-item-text'+this.id).text(ytDownloader.visibleSongs[this.id].title);
+		$('#table-item-duration'+this.id).text(generateDurationString(this.id));
 		$('#thumbnail'+this.id).attr("src",ytDownloader.visibleSongs[this.id].thumbnail);
 	};
 
@@ -69,8 +83,9 @@
     					<button id="'+i+'" type="button" class="btn btn-default btn-sm"> \
   						<span  class="glyphicon glyphicon-refresh" aria-hidden="true"></span> \
 						</button></td> \
-            			<td id="table-item-text'+i+'"></td> \
-          				<th scope="row"><input type="checkbox"></th> \
+						<td id="table-item-text'+i+'"></td> \
+						<td id="table-item-duration'+i+'"></td> \
+          				<td scope="row"><input type="checkbox"></td> \
           				</tr>';
           	$('#table').append(item);
           	document.getElementById(i).onclick = refresh;
@@ -110,6 +125,7 @@
         <thead>
           <tr><th></th>
           <th>Title</th>
+          <th>Duration</th>
           <th><input type="checkbox"></th>
          
         </tr></thead>
