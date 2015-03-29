@@ -70,7 +70,6 @@ var findVideos = function(keyword, maxResults, callback) {
                 var metaData = {
                     URL: 'https://www.youtube.com/watch?v=' + data.items[0].id,
                     title: data.items[0].snippet.title,
-                    thumbnail: data.items[0].snippet.thumbnails.default.url,
                     minutes: duration.minutes,
                     seconds: duration.seconds
                 };

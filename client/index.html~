@@ -15,7 +15,6 @@
 	var searchCallback = function() {
 		for (var i = 0; i < ytDownloader.SONG_SLOTS; i++) {
     		$('#table-item-text'+i).text(ytDownloader.visibleSongs[i].title);
-    		$('#thumbnail'+i).attr("src",ytDownloader.visibleSongs[i].thumbnail);
     	}; 
 	};
 
@@ -39,7 +38,6 @@
 		console.log(ytDownloader.songs);
 		ytDownloader.visibleSongs[0] = nextSong;
 		$('#table-item-text'+0).text(ytDownloader.visibleSongs[0].title);
-		$('#thumbnail'+0).attr("src",ytDownloader.visibleSongs[0].thumbnail);
 	};
 
 	/*
@@ -71,8 +69,7 @@
     		//var item = '<li '+'id="progress'+i+'">list element...</li>'; //You can add
     		//$('#list').append(item);
 
-    		var item = '<tr><td><img id="thumbnail'+i+'" src="" alt="ooo">\
-    					<button id="refreshButton'+i+'" type="button" class="btn btn-default btn-sm"> \
+    		var item = '<tr><td><button id="refreshButton'+i+'" type="button" class="btn btn-default btn-sm"> \
   						<span  class="glyphicon glyphicon-refresh" aria-hidden="true"></span> \
 						</button></td> \
             			<td id="table-item-text'+i+'"></td> \
