@@ -31,15 +31,12 @@
 	Replace current song with next song in the queue.
 	*/
 	var refresh = function() {
-		console.log(ytDownloader.visibleSongs);
 		var nextSong = ytDownloader.songs.shift();
-		var oldSong = ytDownloader.visibleSongs[0];
-		console.log(oldSong);
+		var oldSong = ytDownloader.visibleSongs[this.id];
 		ytDownloader.songs[ytDownloader.songs.length] = oldSong;
-		console.log(ytDownloader.songs);
-		ytDownloader.visibleSongs[0] = nextSong;
-		$('#table-item-text'+0).text(ytDownloader.visibleSongs[0].title);
-		$('#thumbnail'+0).attr("src",ytDownloader.visibleSongs[0].thumbnail);
+		ytDownloader.visibleSongs[this.id] = nextSong;
+		$('#table-item-text'+this.id).text(ytDownloader.visibleSongs[this.id].title);
+		$('#thumbnail'+this.id).attr("src",ytDownloader.visibleSongs[this.id].thumbnail);
 	};
 
 	/*
@@ -68,20 +65,16 @@
 	var init = function() {
 		// Create progress list
     	for (var i = 0; i < ytDownloader.SONG_SLOTS; i++) {
-    		//var item = '<li '+'id="progress'+i+'">list element...</li>'; //You can add
-    		//$('#list').append(item);
-
     		var item = '<tr><td><img id="thumbnail'+i+'" src="" alt="ooo">\
-    					<button id="refreshButton'+i+'" type="button" class="btn btn-default btn-sm"> \
+    					<button id="'+i+'" type="button" class="btn btn-default btn-sm"> \
   						<span  class="glyphicon glyphicon-refresh" aria-hidden="true"></span> \
 						</button></td> \
             			<td id="table-item-text'+i+'"></td> \
           				<th scope="row"><input type="checkbox"></th> \
           				</tr>';
           	$('#table').append(item);
+          	document.getElementById(i).onclick = refresh;
     	};
-    	document.getElementById('refreshButton0').onclick = refresh;
-    	console.log('init done.');
  	};
 
  	/*
