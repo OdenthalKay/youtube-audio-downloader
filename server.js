@@ -9,6 +9,7 @@ var MAX_RESULTS = 20;
 var SONG_SLOTS = 5;
 exports.MAX_RESULTS = MAX_RESULTS;
 exports.SONG_SLOTS = SONG_SLOTS;
+exports.DEFAULT_DOWNLOAD_DIRECTORY = 'No download path specified.';
 
 /*
 Save metaData about every song.
@@ -31,13 +32,29 @@ exports.search = function(artist, clientCallback) {
 duration: ISO 8601 String
 returns: Object with minutes und seconds
 */
-var extractMinutesAndSeconds = function(duration) {
-    var regex = /PT(.*?)M(.*?)S/g;
-    var match = regex.exec(duration);
+var extractDuration = function(duration) {
+    var regex = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/;
+          var hours = 0, minutes = 0, seconds = 0;
+            var matches = regex.exec(duration);
+            if (matches[1]) {
+                hours = matches[1];
+            }
+            if (matches[2]) {
+                minutes = matches[2];
+            }
+            if (matches[3]) {
+                seconds = matches[3];
+            }
+            
+            console.log("hours:"+hours);
+            console.log("minutes:"+minutes);
+            console.log("seconds:"+seconds);
+          
     return {
-        minutes: match[1],
-        seconds: match[2]
-    }
+        hours: hours,
+        minutes: minutes,
+        seconds: seconds
+    };
 };
 
 /*
@@ -66,11 +83,12 @@ var findVideos = function(keyword, maxResults, callback) {
                 }
 
                 // return meta data object
-                var duration = extractMinutesAndSeconds(data.items[0].contentDetails.duration);
+                var duration = extractDuration(data.items[0].contentDetails.duration);
                 var metaData = {
                     URL: 'https://www.youtube.com/watch?v=' + data.items[0].id,
                     title: data.items[0].snippet.title,
                     thumbnail: data.items[0].snippet.thumbnails.default.url,
+                    hours: duration.hours,
                     minutes: duration.minutes,
                     seconds: duration.seconds
                 };
