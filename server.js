@@ -15,16 +15,13 @@ exports.DEFAULT_DOWNLOAD_DIRECTORY = 'No download path specified.';
 Save metaData about every song.
 */
 exports.search = function(artist, clientCallback) {
-    findVideos(artist, MAX_RESULTS, function(err, metaData) {
+    findVideos(artist, function(err) {
         if (err) {
             console.log(err);
         }
-        exports.songs[exports.songs.length] = metaData;
-        if (exports.songs.length == MAX_RESULTS) {
-           exports.visibleSongs = exports.songs.slice(0, SONG_SLOTS);
-           exports.songs.splice(0, SONG_SLOTS);
-           clientCallback();
-       }
+        exports.visibleSongs = exports.songs.slice(0, SONG_SLOTS);
+        exports.songs.splice(0, SONG_SLOTS);
+        clientCallback();
    });
 };
 
@@ -34,22 +31,18 @@ returns: Object with minutes und seconds
 */
 var extractDuration = function(duration) {
     var regex = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/;
-          var hours = 0, minutes = 0, seconds = 0;
-            var matches = regex.exec(duration);
-            if (matches[1]) {
-                hours = matches[1];
-            }
-            if (matches[2]) {
-                minutes = matches[2];
-            }
-            if (matches[3]) {
-                seconds = matches[3];
-            }
-            
-            console.log("hours:"+hours);
-            console.log("minutes:"+minutes);
-            console.log("seconds:"+seconds);
-          
+    var hours = 0, minutes = 0, seconds = 0;
+    var matches = regex.exec(duration);
+    if (matches[1]) {
+        hours = matches[1];
+    }
+    if (matches[2]) {
+        minutes = matches[2];
+    }
+    if (matches[3]) {
+        seconds = matches[3];
+    } 
+
     return {
         hours: hours,
         minutes: minutes,
@@ -61,12 +54,12 @@ var extractDuration = function(duration) {
 callback: is called once for every video resource.
 returns: meta data object with detailed video information of a single video.
 */
-var findVideos = function(keyword, maxResults, callback) {
+var findVideos = function(keyword, callback) {
     Youtube.search.list({
         q: keyword,
         part: 'id,snippet',
         type: 'video',
-        maxResults: maxResults
+        maxResults: MAX_RESULTS
     }, function(err, data) {
         if (err) {
             return callback(new Error('Failed to find youtube videos. Reason: ' + err.message));
@@ -82,7 +75,6 @@ var findVideos = function(keyword, maxResults, callback) {
                     return callback(new Error('Failed to find detailed video information. Reason: ' + err.message));
                 }
 
-                // return meta data object
                 var duration = extractDuration(data.items[0].contentDetails.duration);
                 var metaData = {
                     URL: 'https://www.youtube.com/watch?v=' + data.items[0].id,
@@ -92,8 +84,10 @@ var findVideos = function(keyword, maxResults, callback) {
                     minutes: duration.minutes,
                     seconds: duration.seconds
                 };
-
-                callback(null, metaData);
+                exports.songs.push(metaData);
+                if (exports.songs.length == MAX_RESULTS) {
+                    callback(null);
+                }
             });
         }
     });
