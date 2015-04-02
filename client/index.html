@@ -120,9 +120,19 @@
 		var directoryChooser = $('#directory');
 	    directoryChooser.change(function(evt) {
 	      var value = $(this).val();
+	      console.log()
 	      ytDownloader.directory =  value;
 	      $("#directory-path").text(value);
 	    });
+	};
+
+	/*
+	Triggers a click on the hidden node-webkits directory dialog 'nwdirectory', once the custom directory button was clicked. 
+	Using a custom button because the default one is ugly...
+	*/
+	var triggerClickOnDirectoryChooser = function() {
+		var chooser = $('#directory');
+    	chooser.trigger('click');
 	};
 
  	</script>
@@ -156,10 +166,11 @@
   <div class="panel-footer clearfix">
         <div class="pull-left">
             <a href="#" class="btn btn-primary" id="download">Download</a>
+            <span><a href="#" class="btn btn-primary" id="directory-button">Directory </a><strong id="directory-path"></strong></span>
+            
 
-          	<input  type="file" id="directory" nwdirectory />
-          	<p>Directory: <strong id="directory-path"></strong></p>
-
+          	<!-- a click on this invisible element will be triggered by a click on the 'directory' button -->
+          	<input  style="display:none;" type="file" id="directory" nwdirectory />
         </div>
     </div>
 </div>
@@ -168,6 +179,7 @@
 	<script>
 	$( document ).ready(init);
 	document.getElementById('directory').onclick = chooseDirectory;
+	document.getElementById('directory-button').onclick = triggerClickOnDirectoryChooser;
  	document.getElementById('search').onclick = search;
  	document.getElementById('download').onclick = startDownloads;
 	</script>
