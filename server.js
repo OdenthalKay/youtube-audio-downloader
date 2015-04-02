@@ -1,7 +1,8 @@
 var spawn = require('child_process').spawn;
 var Youtube = require('youtube-api');
 
-var DEFAULT_DOWNLOAD_DIRECTORY = '~/Desktop/youtube-audio-downloader';
+var processes = [];
+var DEFAULT_DOWNLOAD_DIRECTORY = '~/Desktop/songs';
 var filePrefix = 'file';
 var MAX_RESULTS = 20;
 var SONG_SLOTS = 5;
@@ -13,6 +14,7 @@ exports.progress = [];
 exports.songs = []; // metadata about every song
 exports.visibleSongs = []; // songs seen by the user
 exports.directory = DEFAULT_DOWNLOAD_DIRECTORY;
+exports.isDownloadActive = false;
 
 /*
 Save metaData about every song.
@@ -104,7 +106,8 @@ In order to filter the stdout output, every process has a unique id.
 */
 var download = function(song, path, callback) {
     console.log(song);
-    var process = spawn('python', ['./youtube-dl','-o', path+'/'+'%(title)s.%(ext)s', '--newline', '--extract-audio', '--audio-format', 'mp3', song.url]);
+    var process = spawn('python', ['./youtube-dl','-o', path+'/'+'%(title)s.%(ext)s', '--newline', '--no-continue', '--extract-audio', '--audio-format', 'mp3', song.url]);
+    processes.push(process);
     process.id = song.index;
 
     process.stdout.on('data', function(data) {
@@ -114,8 +117,11 @@ var download = function(song, path, callback) {
     process.stderr.on('data', function(data) {
         console.log(process.id+'stderr: ' + data);
     });
-    process.on('close', function(code) {
-        exports.progress[process.id] = 'Download complete.';
+    process.on('close', function(code) { 
+        if (code == 0) {
+            exports.progress[process.id] = 'Download complete.';
+        } 
+        
         console.log(process.id+'child process exited with code ' + code);
     });
 };
@@ -131,6 +137,13 @@ var downloadSongs = function(songs) {
             }
         });
     };
+};
+
+exports.cancelDownloads = function() {
+    for (var i = 0; i < processes.length; i++) {
+        console.log('killing process.');
+        processes[i].kill('SIGINT');
+    }
 };
 
 /*

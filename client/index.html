@@ -8,7 +8,8 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 	<script>
 	var ytDownloader = require('../server.js');
-
+	var interval = {}; // needed in order to stop polling once the download was canceled
+	
 	/*
 	Called once the youtube search has finished.
 	*/
@@ -72,10 +73,13 @@
 		$('#thumbnail'+this.id).attr("src",ytDownloader.visibleSongs[this.id].thumbnail);
 	};
 
+
+
 	/*
 	Start the download process.
 	*/
 	var startDownloads = function() {
+		console.log('startDownloads');
 		for (var i = 0; i < ytDownloader.SONG_SLOTS; i++) {
 			if ($('#checkbox'+i).is(':checked')) {
 				ytDownloader.visibleSongs[i].checked = true;
@@ -87,15 +91,50 @@
 	};
 
 	/*
+	Change the appearence of the download button.
+	It's either DOWNLOAD or Cancel.
+	*/
+	var toggleDownloadButton = function() {
+		if (!ytDownloader.isDownloadActive) {
+			$('#download').prop('class', 'btn btn-danger');
+			$('#download').text('Cancel');
+			startDownloads();
+			ytDownloader.isDownloadActive = true;
+		} else {
+			$('#download').prop('class', 'btn btn-primary');
+			$('#download').text('Download');
+			cancelDownloads();
+			ytDownloader.isDownloadActive = false;
+		}
+	};
+
+	/*
+	Cancel all downloads.
+	*/
+	var cancelDownloads = function() {
+		console.log('cancelDownloads');
+		deactivatePolling();
+		ytDownloader.cancelDownloads();
+
+		// Reset the info text (show title instead of progress info)
+		for (var i = 0; i < ytDownloader.SONG_SLOTS; i++) {
+			$('#table-item-text'+i).text(ytDownloader.visibleSongs[i].title);
+		}
+	};
+
+	/*
 	Check download progress.
 	*/
 	var activatePolling = function() {
-		setInterval(function() { 
+		interval = setInterval(function() { 
     		$.each(ytDownloader.progress, function( index, value ) {
     			//$( "#progress" + index ).text(value);
     			$( "#table-item-text" + index ).text(value);
     		});
     	}, 300);
+	};
+	var deactivatePolling = function() {
+		clearInterval(interval);
 	};
 
 	/*
@@ -197,7 +236,7 @@
 	document.getElementById('directory').onclick = chooseDirectory;
 	document.getElementById('directory-button').onclick = triggerClickOnDirectoryChooser;
  	document.getElementById('search').onclick = search;
- 	document.getElementById('download').onclick = startDownloads;
+ 	document.getElementById('download').onclick = toggleDownloadButton;
 	</script>
  </body>
  </html>
