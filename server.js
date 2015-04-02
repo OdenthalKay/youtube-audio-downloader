@@ -1,15 +1,17 @@
 var spawn = require('child_process').spawn;
 var Youtube = require('youtube-api');
 
-exports.progress = [];
-exports.songs = []; // metadata about every song
-exports.visibleSongs = []; // songs seen by the user
-var DEFAULT_DOWNLOAD_DIRECTORY = 'No download path specified.';
+var DEFAULT_DOWNLOAD_DIRECTORY = '~/Desktop/youtube-audio-downloader';
 var filePrefix = 'file';
 var MAX_RESULTS = 20;
 var SONG_SLOTS = 5;
+exports.DEFAULT_ARTIST = 'Justin Bieber';
 exports.MAX_RESULTS = MAX_RESULTS;
 exports.SONG_SLOTS = SONG_SLOTS;
+exports.DEFAULT_DOWNLOAD_DIRECTORY = DEFAULT_DOWNLOAD_DIRECTORY;
+exports.progress = [];
+exports.songs = []; // metadata about every song
+exports.visibleSongs = []; // songs seen by the user
 exports.directory = DEFAULT_DOWNLOAD_DIRECTORY;
 
 /*

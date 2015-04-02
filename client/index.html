@@ -76,11 +76,6 @@
 	Start the download process.
 	*/
 	var startDownloads = function() {
-	if ($('#directory-path').text() === ytDownloader.DEFAULT_DOWNLOAD_DIRECTORY) {
-		console.log('no download path...');
-		//return;
-	} 
-
 		ytDownloader.start();
 		activatePolling();
 	};
@@ -112,7 +107,8 @@
           				<td scope="row"><input type="checkbox"></td> \
           				</tr>';
           	$('#table').append(item);
-          	//$("#directory-path").text(ytDownloader.DEFAULT_DOWNLOAD_DIRECTORY);
+          	$('#search-box').attr('value', ytDownloader.DEFAULT_ARTIST);
+          	$('#directory-path').text(ytDownloader.DEFAULT_DOWNLOAD_DIRECTORY);
           	document.getElementById(i).onclick = refresh;
     	};
  	};
@@ -127,7 +123,6 @@
 	      ytDownloader.directory =  value;
 	      $("#directory-path").text(value);
 	    });
-	    //directoryChooser.trigger('click');
 	};
 
  	</script>
@@ -164,9 +159,7 @@
 
           	<input  type="file" id="directory" nwdirectory />
           	<p>Directory: <strong id="directory-path"></strong></p>
-     
-  
-          	
+
         </div>
     </div>
 </div>
