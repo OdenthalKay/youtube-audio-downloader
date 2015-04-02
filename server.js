@@ -103,7 +103,7 @@ In order to filter the stdout output, every process has a unique id.
 */
 var download = function(URL, path, index, callback) {
     var fileName = filePrefix + index;
-    var process = spawn('python', ['./youtube-dl','-o', path+'/'+fileName+'.%(ext)s', '--newline', '--extract-audio', '--audio-format', 'mp3', URL]);
+    var process = spawn('python', ['./youtube-dl','-o', path+'/'+'%(title)s.%(ext)s', '--newline', '--extract-audio', '--audio-format', 'mp3', URL]);
     process.id = index;
 
     process.stdout.on('data', function(data) {
