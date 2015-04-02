@@ -4,12 +4,13 @@ var Youtube = require('youtube-api');
 exports.progress = [];
 exports.songs = []; // metadata about every song
 exports.visibleSongs = []; // songs seen by the user
+var DEFAULT_DOWNLOAD_DIRECTORY = 'No download path specified.';
 var filePrefix = 'file';
 var MAX_RESULTS = 20;
 var SONG_SLOTS = 5;
 exports.MAX_RESULTS = MAX_RESULTS;
 exports.SONG_SLOTS = SONG_SLOTS;
-exports.DEFAULT_DOWNLOAD_DIRECTORY = 'No download path specified.';
+exports.directory = DEFAULT_DOWNLOAD_DIRECTORY;
 
 /*
 Save metaData about every song.
@@ -119,9 +120,9 @@ var download = function(URL, path, index, callback) {
 /*
 Download an Array of Songs.
 */
-var downloadSongs = function(URLs, path) {
+var downloadSongs = function(URLs) {
     for (var i = 0; i < URLs.length; i++) {
-        download(URLs[i], path,  i, function(error) {
+        download(URLs[i], exports.directory,  i, function(error) {
             if (error) {
                 console.log(error);
             }
@@ -154,11 +155,11 @@ Youtube.authenticate({
 /*
 Start the download process manually.
 */
-exports.start = function(path) {
+exports.start = function() {
     var urls = [];
-    for (var i = 0; i < MAX_RESULTS; i++) {
-        urls[i] = exports.songs[i].URL;
+    for (var i = 0; i < SONG_SLOTS; i++) {
+        urls[i] = exports.visibleSongs[i].URL;
     }
-    downloadSongs(urls, path);
+    downloadSongs(urls);
 };
 

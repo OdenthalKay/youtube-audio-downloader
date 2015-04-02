@@ -81,7 +81,7 @@
 		//return;
 	} 
 
-		ytDownloader.start($('#directory-path').text());
+		ytDownloader.start();
 		activatePolling();
 	};
 
@@ -112,7 +112,7 @@
           				<td scope="row"><input type="checkbox"></td> \
           				</tr>';
           	$('#table').append(item);
-          	$("#directory-path").text(ytDownloader.DEFAULT_DOWNLOAD_DIRECTORY);
+          	//$("#directory-path").text(ytDownloader.DEFAULT_DOWNLOAD_DIRECTORY);
           	document.getElementById(i).onclick = refresh;
     	};
  	};
@@ -121,12 +121,13 @@
 	Set download path via node-webkits directory dialog 'nwdirectory'.
  	*/
  	var chooseDirectory = function() {
-		var directoryChooser = $('#download-path');
+		var directoryChooser = $('#directory');
 	    directoryChooser.change(function(evt) {
 	      var value = $(this).val();
-	      $('#directory-path').text(value);
+	      ytDownloader.directory =  value;
+	      $("#directory-path").text(value);
 	    });
-	    directoryChooser.trigger('click');
+	    //directoryChooser.trigger('click');
 	};
 
  	</script>
@@ -160,7 +161,12 @@
   <div class="panel-footer clearfix">
         <div class="pull-left">
             <a href="#" class="btn btn-primary" id="download">Download</a>
-          	<a href="#" class="btn btn-default" id="directory">Directory</a> <strong id="directory-path"></strong>
+
+          	<input  type="file" id="directory" nwdirectory />
+          	<p>Directory: <strong id="directory-path"></strong></p>
+     
+  
+          	
         </div>
     </div>
 </div>
