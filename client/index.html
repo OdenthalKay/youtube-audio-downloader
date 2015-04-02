@@ -76,6 +76,12 @@
 	Start the download process.
 	*/
 	var startDownloads = function() {
+		for (var i = 0; i < ytDownloader.SONG_SLOTS; i++) {
+			if ($('#checkbox'+i).is(':checked')) {
+				ytDownloader.visibleSongs[i].checked = true;
+				console.log(ytDownloader.visibleSongs[i]);
+			}
+		}
 		ytDownloader.start();
 		activatePolling();
 	};
@@ -104,7 +110,7 @@
 						</button></td> \
 						<td style="width:500px;" id="table-item-text'+i+'"></td> \
 						<td id="table-item-duration'+i+'"></td> \
-          				<td scope="row"><input type="checkbox"></td> \
+          				<td scope="row"><input type="checkbox" class="checkbox" id="checkbox'+i+'"></td> \
           				</tr>';
           	$('#table').append(item);
           	$('#search-box').attr('value', ytDownloader.DEFAULT_ARTIST);
@@ -156,7 +162,7 @@
           <tr><th></th>
           <th>Title</th>
           <th>Duration</th>
-          <th><input type="checkbox"></th>
+          <th><input type="checkbox" id="master-checkbox"></th>
          
         </tr></thead>
         <tbody>
@@ -178,6 +184,16 @@
 
 	<script>
 	$( document ).ready(init);
+
+	var toggleMasterCheckbox = function() {
+		if ($('#master-checkbox').is(':checked')) {
+			$('.checkbox').prop('checked', true);
+		} else {
+			$('.checkbox').prop('checked', false);
+		}
+	};
+
+	document.getElementById('master-checkbox').onclick = toggleMasterCheckbox;
 	document.getElementById('directory').onclick = chooseDirectory;
 	document.getElementById('directory-button').onclick = triggerClickOnDirectoryChooser;
  	document.getElementById('search').onclick = search;

@@ -85,7 +85,8 @@ var findVideos = function(keyword, callback) {
                     thumbnail: data.items[0].snippet.thumbnails.default.url,
                     hours: duration.hours,
                     minutes: duration.minutes,
-                    seconds: duration.seconds
+                    seconds: duration.seconds,
+                    checked: false
                 };
                 exports.songs.push(metaData);
                 if (exports.songs.length == MAX_RESULTS) {
@@ -101,10 +102,10 @@ Download a single Song.
 Uses 'spawn' instead of 'exec' so that the download progress can be fetched.
 In order to filter the stdout output, every process has a unique id.
 */
-var download = function(URL, path, index, callback) {
-    var fileName = filePrefix + index;
-    var process = spawn('python', ['./youtube-dl','-o', path+'/'+'%(title)s.%(ext)s', '--newline', '--extract-audio', '--audio-format', 'mp3', URL]);
-    process.id = index;
+var download = function(song, path, callback) {
+    console.log(song);
+    var process = spawn('python', ['./youtube-dl','-o', path+'/'+'%(title)s.%(ext)s', '--newline', '--extract-audio', '--audio-format', 'mp3', song.url]);
+    process.id = song.index;
 
     process.stdout.on('data', function(data) {
         exports.progress[process.id] = data;
@@ -122,9 +123,9 @@ var download = function(URL, path, index, callback) {
 /*
 Download an Array of Songs.
 */
-var downloadSongs = function(URLs) {
-    for (var i = 0; i < URLs.length; i++) {
-        download(URLs[i], exports.directory,  i, function(error) {
+var downloadSongs = function(songs) {
+    for (var i = 0; i < songs.length; i++) {
+        download(songs[i], exports.directory, function(error) {
             if (error) {
                 console.log(error);
             }
@@ -158,10 +159,19 @@ Youtube.authenticate({
 Start the download process manually.
 */
 exports.start = function() {
-    var urls = [];
+    //var urls = [];
+    var songs = [];
     for (var i = 0; i < SONG_SLOTS; i++) {
-        urls[i] = exports.visibleSongs[i].URL;
+        // Only download songs that have been checked by the user
+        if (exports.visibleSongs[i].checked) {
+            //urls.push(exports.visibleSongs[i].URL);
+            var downloadSong = {
+                url: exports.visibleSongs[i].URL,
+                index: i
+            };
+            songs.push(downloadSong);
+        }
     }
-    downloadSongs(urls);
+    downloadSongs(songs);
 };
 
