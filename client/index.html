@@ -6,14 +6,19 @@
 	<link rel="stylesheet" href="style.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="dist/ladda-themeless.min.css">
+	<script src="dist/spin.min.js"></script>
+	<script src="dist/ladda.min.js"></script>
 	<script>
 	var ytDownloader = require('../server.js');
 	var interval = {}; // needed in order to stop polling once the download was canceled
-	
+	var ladda = {}; // display search progress
+
 	/*
 	Called once the youtube search has finished.
 	*/
 	var searchCallback = function() {
+		ladda.stop();
 		for (var i = 0; i < ytDownloader.SONG_SLOTS; i++) {
     		$('#table-item-text'+i).text(ytDownloader.visibleSongs[i].title);
     		$('#table-item-duration'+i).text(generateDurationString(i));
@@ -56,6 +61,7 @@
 	Trigger server side youtube search request.
 	*/
 	var search = function() {
+		ladda.start();
 		var artist = $('#search-box').val();
 		ytDownloader.search(artist,searchCallback); 
 	};
@@ -63,17 +69,33 @@
 	/*
 	Replace current song with next song in the queue.
 	*/
-	var refresh = function() {
-		var nextSong = ytDownloader.songs.shift();
-		var oldSong = ytDownloader.visibleSongs[this.id];
-		ytDownloader.songs[ytDownloader.songs.length] = oldSong;
-		ytDownloader.visibleSongs[this.id] = nextSong;
-		$('#table-item-text'+this.id).text(ytDownloader.visibleSongs[this.id].title);
-		$('#table-item-duration'+this.id).text(generateDurationString(this.id));
-		$('#thumbnail'+this.id).attr("src",ytDownloader.visibleSongs[this.id].thumbnail);
+	var refresh = function(index) {
+		$('#table-item-text'+index).text(ytDownloader.visibleSongs[index].title);
+		$('#table-item-duration'+index).text(generateDurationString(index));
+		$('#thumbnail'+index).attr("src",ytDownloader.visibleSongs[index].thumbnail);
 	};
 
+	/*
+	Replace current song with next song in the queue.
+	*/
+	var next = function() {
+		// extract numerical id from css id
+		var index = this.id.replace(/[^0-9]/g,'');
+		ytDownloader.songs.push(ytDownloader.visibleSongs[index]);
+		ytDownloader.visibleSongs[index] = ytDownloader.songs.shift();
+		refresh(index);
+	};
 
+	/*
+	Replace current song with previous song in the queue.
+	*/
+	var previous = function() {
+		// extract numerical id from css id
+		var index = this.id.replace(/[^0-9]/g,'');
+		ytDownloader.songs.unshift(ytDownloader.visibleSongs[index]);
+		ytDownloader.visibleSongs[index] = ytDownloader.songs.pop();
+		refresh(index);
+	};
 
 	/*
 	Start the download process.
@@ -143,9 +165,12 @@
 	var init = function() {
 		// Create progress list
     	for (var i = 0; i < ytDownloader.SONG_SLOTS; i++) {
-    		var item = '<tr><td style="height:70px;width:150px;"><img style="height:60px;width:80px;" id="thumbnail'+i+'" src="" alt="ooo">\
-    					<button id="'+i+'" type="button" class="btn btn-default btn-sm"> \
-  						<span  class="glyphicon glyphicon-refresh" aria-hidden="true"></span> \
+    		var item = '<tr><td style="width:200px;"><img style="height:50px;width:60px;" id="thumbnail'+i+'" src="" alt="ooo">\
+    					<button id="previous'+i+'" type="button" class="btn btn-default btn-sm"> \
+  						<span  class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> \
+						</button> \
+    					<button id="next'+i+'" type="button" class="btn btn-default btn-sm"> \
+  						<span  class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span> \
 						</button></td> \
 						<td style="width:500px;" id="table-item-text'+i+'"></td> \
 						<td id="table-item-duration'+i+'"></td> \
@@ -154,7 +179,11 @@
           	$('#table').append(item);
           	$('#search-box').attr('value', ytDownloader.DEFAULT_ARTIST);
           	$('#directory-path').text(ytDownloader.DEFAULT_DOWNLOAD_DIRECTORY);
-          	document.getElementById(i).onclick = refresh;
+          	//document.getElementById(i).onclick = refresh;
+          	document.getElementById('previous'+i).onclick = previous;
+          	document.getElementById('next'+i).onclick = next;
+          	// Create a new instance of ladda for the search button 
+			ladda = Ladda.create(document.querySelector( '#search' ));
     	};
  	};
 
@@ -188,12 +217,13 @@
 <div class="panel panel-default" style="width:800px;">
   <!-- Default panel contents -->
    	<input style="width:450px;" id ="search-box" type="text" name="search box">
- 	<button id="search" class="btn btn-primary">search</button>
+   	<button class="btn btn-primary ladda-button" data-style="zoom-in" id="search">
+	<span  class="glyphicon glyphicon-search" aria-hidden="true"></span> 
+   	</button>
 
     <!--
     <div id="alert-box" class="alert alert-danger" role="alert">Search is too specific. Didn't find enough videos. Try again.</div>
 	-->
-
 
       <!-- Table -->
 <table id="table" class="table">
@@ -223,6 +253,8 @@
 
 	<script>
 	$( document ).ready(init);
+
+
 
 	var toggleMasterCheckbox = function() {
 		if ($('#master-checkbox').is(':checked')) {

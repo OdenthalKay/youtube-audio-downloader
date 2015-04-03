@@ -11,9 +11,9 @@
     "socket.io": "~0.9.14"
   },
   "window": {
-    "title": "node-webkit demo",
-    "toolbar": true,
+    "title": "Youtube MP3 Downloader",
+    "toolbar": false,
     "width": 900,
-    "height": 800
+    "height": 850
   }
 }
